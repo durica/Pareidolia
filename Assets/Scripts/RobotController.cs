@@ -12,13 +12,14 @@ public class RobotController : MonoBehaviour {
 	private Vector3 oriDotPos = new Vector3();
 	private BoxCollider2D myCollider = new BoxCollider2D();
 	private Vector3 spawnPos = new Vector3();
+	bool isControlling = false;
 
 	Animator anim;
 
 	// Use this for initialization
 	void Start () {
 		anim = GetComponent<Animator>();
-		oriDotPos = GameObject.FindGameObjectWithTag("controlDot").transform.position;
+
 		myCollider = gameObject.GetComponent<BoxCollider2D>();
 		spawnPos = transform.position;
 	}
@@ -36,10 +37,36 @@ public class RobotController : MonoBehaviour {
 	void Update(){
 
 		bool needmove = false;
-
 		Vector3 newDotPos = GameObject.FindGameObjectWithTag("controlDot").transform.position;
-		Vector2 control = new Vector2(newDotPos.x - oriDotPos.x , newDotPos.y - oriDotPos.y);
 
+		
+		// people was dead, temporary use
+		if(rigidbody2D.velocity.y < -15)
+		{
+			transform.position = spawnPos;
+			rigidbody2D.velocity = new Vector2(0,0);
+		}
+
+
+		if(newDotPos.x<-90)
+		{
+			if(isControlling)
+			{
+				isControlling = false;
+				StandUp();
+			}
+			anim.SetFloat("speed",Mathf.Abs(rigidbody2D.velocity.x));
+			return;
+		}
+		else 
+		{
+			if(!isControlling)
+				oriDotPos = newDotPos;
+			isControlling = true;
+		}
+
+
+		Vector2 control = new Vector2(newDotPos.x - oriDotPos.x , newDotPos.y - oriDotPos.y);
 		if(control.magnitude > 0.2)
 		{
 			needmove = true;
@@ -48,26 +75,22 @@ public class RobotController : MonoBehaviour {
 		{
 			control = Vector2.zero;
 		}
-
 		
 		// when control.y < 0, player is crouching, disable the box collider, and rotate character
-		if(control.y < 0)
+		if(control.y < -0.5)
 		{
-			if(!myCollider.isTrigger)
-				transform.Rotate(Vector3.forward,90.0f,Space.World);
-			myCollider.isTrigger = true;
+			ChrouchDown();
 		}
 		else
 		{
-			if(myCollider.isTrigger)
-				transform.Rotate(Vector3.forward,-90.0f,Space.World);
-			myCollider.isTrigger = false;
+			StandUp();
+			transform.position = new Vector3(transform.position.x, transform.position.y + 0.001f, transform.position.z);
 		}
 
 		if(!onGround)
 			control.y = 0;
 		else
-			control.y = control.y > 0.5 ? 1 : control.y;
+			control.y = control.y > 0.5 ? 1 : 0;
 
 
 		Debug.Log(myCollider.isTrigger);
@@ -90,13 +113,6 @@ public class RobotController : MonoBehaviour {
 			}
 		}
 
-		// people was dead, temporary use
-		if(rigidbody2D.velocity.y < -15)
-		{
-			transform.position = spawnPos;
-			rigidbody2D.velocity = new Vector2(0,0);
-		}
-
 	}
 
 	void flip(){
@@ -104,6 +120,18 @@ public class RobotController : MonoBehaviour {
 		Vector3 theScale = transform.localScale;
 		theScale.x *= -1;
 		transform.localScale = theScale;
+	}
+
+	void ChrouchDown(){
+		if(!myCollider.isTrigger)
+			transform.Rotate(Vector3.forward,90.0f,Space.World);
+		myCollider.isTrigger = true;
+	}
+
+	void StandUp(){
+		if(myCollider.isTrigger)
+			transform.Rotate(Vector3.forward,-90.0f,Space.World);
+		myCollider.isTrigger = false;
 	}
 
 }

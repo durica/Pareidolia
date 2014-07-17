@@ -9,13 +9,13 @@ public class PickManager : MonoBehaviour {
 	static float drag = 10.0f;
 	static float angularDrag = 5.0f;
 	
-	public static void PickManagerConfigure(Camera mainCamera, int range = 100){
+	public static void PickManagerConfigure(Camera mainCamera, int range){
 		camera = mainCamera;
 		pickRange = range;
 		Debug.Log("You have configure the pick manager.");
 	}
 	
-	public static GameObject StartPick(Vector2 mousePosition, string tag=null){
+	public static GameObject StartPick(Vector2 mousePosition, string tag){
 		if (camera == null) {
 			Debug.LogError("You havent set the camera yet.");
 			return null;
