@@ -25,10 +25,17 @@ public class RobotController : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D(Collision2D col){
-		onGround = true;
+		if(col.gameObject.tag == "ladders") {
+			rigidbody2D.gravityScale = 0;
+		} else {
+			onGround = true;
+		}
 	}
 
 	void OnCollisionExit2D(Collision2D col){
+		if(col.gameObject.tag == "ladders") {
+			rigidbody2D.gravityScale = 1;
+		}
 		onGround = false;
 	}
 
@@ -39,61 +46,50 @@ public class RobotController : MonoBehaviour {
 		bool needmove = false;
 		Vector3 newDotPos = GameObject.FindGameObjectWithTag("controlDot").transform.position;
 
-		
 		// people was dead, temporary use
-		if(rigidbody2D.velocity.y < -15)
-		{
+		if(rigidbody2D.velocity.y < -15) {
 			transform.position = spawnPos;
 			rigidbody2D.velocity = new Vector2(0,0);
 		}
 
 
-		if(newDotPos.x<-90)
-		{
-			if(isControlling)
-			{
+		if(newDotPos.x<-90) {
+			if(isControlling) {
 				isControlling = false;
 				StandUp();
 			}
 			anim.SetFloat("speed",Mathf.Abs(rigidbody2D.velocity.x));
 			return;
-		}
-		else 
-		{
-			if(!isControlling)
+		} else {
+			if(!isControlling) {
 				oriDotPos = newDotPos;
+			}
 			isControlling = true;
 		}
 
 
 		Vector2 control = new Vector2(newDotPos.x - oriDotPos.x , newDotPos.y - oriDotPos.y);
-		if(control.magnitude > 0.2)
-		{
+		if(control.magnitude > 0.2) {
 			needmove = true;
-		}
-		else 
-		{
+		} else {
 			control = Vector2.zero;
 		}
 		
 		// when control.y < 0, player is crouching, disable the box collider, and rotate character
-		if(control.y < -0.5)
-		{
+		if(control.y < -0.5) {
 			ChrouchDown();
-		}
-		else
-		{
+		} else {
 			StandUp();
-			transform.position = new Vector3(transform.position.x, transform.position.y + 0.001f, transform.position.z);
+			transform.position = new Vector3(transform.position.x, transform.position.y + 0.02f, transform.position.z);
 		}
 
-		if(!onGround)
+		// If stand on ground, enable jump, set control.y = 1
+		if(!onGround) {
 			control.y = 0;
-		else
+		} else {
 			control.y = control.y > 0.5 ? 1 : 0;
+		}
 
-
-		Debug.Log(myCollider.isTrigger);
 
 		anim.SetFloat("speed",Mathf.Abs(control.x));
 		if(needmove)
@@ -102,13 +98,13 @@ public class RobotController : MonoBehaviour {
 			upSpeed = upSpeed > maxSpeedy ? maxSpeedy : upSpeed;
 			rigidbody2D.velocity = new Vector2(control.x * maxSpeedx , upSpeed);
 
-			if(control.x>0 && !facingRight)
+			if(control.x>0 && !facingRight) {
 				flip();
-			else if (control.x<0 && facingRight)
+			} else if (control.x<0 && facingRight) {
 				flip();
+			}
 
-			if(control.y > 0)
-			{
+			if(control.y > 0) {
 				onGround = false;
 			}
 		}
@@ -123,14 +119,16 @@ public class RobotController : MonoBehaviour {
 	}
 
 	void ChrouchDown(){
-		if(!myCollider.isTrigger)
+		if(!myCollider.isTrigger) {
 			transform.Rotate(Vector3.forward,90.0f,Space.World);
+		}
 		myCollider.isTrigger = true;
 	}
 
 	void StandUp(){
-		if(myCollider.isTrigger)
+		if(myCollider.isTrigger) {
 			transform.Rotate(Vector3.forward,-90.0f,Space.World);
+		}
 		myCollider.isTrigger = false;
 	}
 
