@@ -3,18 +3,36 @@ using System.Collections;
 
 public class Movement : MonoBehaviour {
 
-	public float shift;
-	public float shiftx;
-	// Use this for initialization
-	void Start () {
+	public float m_zShift;
+	public float m_xShift;
+	int x;
+
 	
+	// Use this for initialization
+	void Start () 
+	{
+		x=0;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		shift = transform.position.z - 0.01f;
-		shiftx = transform.position.x + 0.01f;
-		transform.position = new Vector3(shiftx,0.0f,shift);
+	void Update () 
+	{
+
+		if (x < 1000)
+		{
+			m_zShift = transform.position.z - 0.01f;
+			m_xShift = transform.position.x;
+			x++;
+		}
+		if (x > 1000)
+		{
+			m_zShift = transform.position.z + 0.01f;
+			m_xShift = transform.position.x + 0.01f;
+		}
+
+		transform.position = new Vector3(m_xShift,transform.position.y,m_zShift);
+		x++;
+
 	}
 }
 

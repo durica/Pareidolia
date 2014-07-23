@@ -231,3 +231,5 @@ pip-log.txt
 
 #Unity3D Generated File On Crash Reports
 sysinfo.txt
+
+*.meta
