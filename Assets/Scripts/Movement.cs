@@ -18,13 +18,13 @@ public class Movement : MonoBehaviour {
 	void Update () 
 	{
 
-		if (x < 1000)
+		if (x < 3000)
 		{
 			m_zShift = transform.position.z - 0.01f;
 			m_xShift = transform.position.x;
 			x++;
 		}
-		if (x > 1000)
+		if (x > 3000)
 		{
 			m_zShift = transform.position.z + 0.01f;
 			m_xShift = transform.position.x + 0.01f;
